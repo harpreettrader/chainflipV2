@@ -4,6 +4,7 @@ import Home from './Home';
 import Shop from './Shop';
 import Play from './Play';
 import Swap from './Swap';
+import Broker from './Broker';
 
 const Dashboard: React.FC = () => {
     const [activeComponent, setActiveComponent] = useState<string>('Swap');
@@ -16,6 +17,8 @@ const Dashboard: React.FC = () => {
         return <Shop />;
       case 'Play':
         return <Play />;
+      case 'Broker':  
+        return <Broker />;
       default:
         return <Swap />;
     }

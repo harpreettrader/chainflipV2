@@ -1,9 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ExchangeComponent from './Exchange';
+import axios from 'axios';
 
 const SwapInterface: React.FC = () => {
+  const [depositAddr, setDepositAddr] = useState<string>('');
+
+  const handleClick = () =>{
+
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: 'https://perseverance.chainflip-broker.io/swap?apikey=dff049a53a4d4cc499cb5f555e316416&sourceAsset=flip.eth&destinationAsset=usdc.arb&destinationAddress=0xfe0442fB1599FE52Bd9Cd40afe0F37F297d867A7',
+      headers: { }
+    };
+    
+    axios.request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+      setDepositAddr(JSON.stringify(response.data.address));
+      alert(depositAddr)
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
+  }
+
   return (
     <div className="p-4 border-t flex flex-col justify-center items-center border-blue-200">
+
+      {depositAddr}
       {/* <div className="mb-4">
         <label htmlFor="token-select" className="block text-sm font-medium text-gray-700">Token</label>
         <select id="token-select" className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
@@ -79,7 +105,7 @@ const SwapInterface: React.FC = () => {
 
 
           
-          <button className="w-full rounded-xl mt-2 p-2 bg-blue-500 text-white">Swap</button>
+          <button className="w-full rounded-xl mt-2 p-2 bg-blue-500 text-white" onClick={handleClick}>Swap</button>
         </div>
   
         {/* Info Box */}

@@ -105,7 +105,7 @@ const ExchangeComponent: React.FC<SwapComponentProps> = ({
   const buyAmount = sellAmount * exchangeRate;
 
   return (
-    <div className="max-w-md mx-auto bg-gray-900 text-white p-6 rounded-lg shadow-lg dark:bg-gray-800 dark:text-gray-200">
+    <div className="max-w-md mx-auto bg-gray-900 text-white p-6 rounded-lg shadow-lg dark:bg-gra dark:text-gray-200">
       <div className="flex justify-between items-center mb-2">
         <div className='p-2'>
           <h2 className="text-xl font-bold">Sell</h2>
