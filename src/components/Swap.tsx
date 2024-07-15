@@ -76,33 +76,7 @@ const SwapInterface: React.FC = () => {
 
           {/** Token select */}
 
-
-          {/* <div className="w-full ">
-            <label className="block mb-2">Select Token:</label> 
-            <select className="w-full p-2 border border-gray-400">
-              <option>ETH/FLIP</option>
-              <option>FLIP/ARB</option>
-              <option>FLIP/RUIN</option>
-            </select>
-          </div>
-          <div className='flex justify-end items-center py-4 pt-2'>
-            <div className="w-full mr-2">
-              <label className="block mb-2"> </label>
-              Balance: XYZ
-            </div>
-            <button className="p-2 bg-gray-500 text-white">Full/MAX</button >
-          </div>
-          <div className="w-full mb-4">
-            <label className="block mb-2">Select Token:</label>
-            <select className="w-full p-2 border border-gray-400">
-              <option>ETH/FLIP</option>
-              <option>FLIP/ARB</option>
-              <option>FLIP/RUIN</option>
-            </select>
-          </div>  */}
-
           <ExchangeComponent sellValue={3137.2} buyValue={47.60} priceChange={-39.3} exchangeRate={40} />
-
 
           
           <button className="w-full rounded-xl mt-2 p-2 bg-blue-500 text-white" onClick={handleClick}>Swap</button>

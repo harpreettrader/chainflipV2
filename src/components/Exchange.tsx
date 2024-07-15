@@ -1,77 +1,11 @@
-// import React, { useState } from 'react';
-
-// const ExchangeComponent: React.FC = () => {
-//   const [sellAmount, setSellAmount] = useState<number>(90);
-//   const [buyAmount, setBuyAmount] = useState<number>(3597.79);
-
-//   const handleSellAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     setSellAmount(parseFloat(e.target.value));
-//   };
-
-//   const handleBuyAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     setBuyAmount(parseFloat(e.target.value));
-//   };
-
-//   return (
-//     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-//       <div className="w-full max-w-md p-6 bg-gray-800 rounded-lg shadow-lg">
-//         {/* Sell Section */}
-//         <div className="flex justify-between items-center mb-4">
-//           <div className="flex flex-col">
-//             <label className="text-sm text-gray-500">Sell</label>
-//             <input
-//               type="number"
-//               value={sellAmount}
-//               onChange={handleSellAmountChange}
-//               className="text-2xl bg-transparent border-none focus:outline-none"
-//             />
-//             <span className="text-sm text-gray-500">$282,354.30</span>
-//           </div>
-//           <div className="flex items-center">
-//             <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="ETH" className="w-6 h-6 mr-2" />
-//             <span>ETH</span>
-//           </div>
-//         </div>
-//         {/* Divider */}
-//         <div className="flex justify-center mb-4">
-//           <button className="p-2 bg-gray-700 rounded-full">
-//             <svg
-//               className="w-6 h-6 text-gray-300"
-//               fill="none"
-//               stroke="currentColor"
-//               viewBox="0 0 24 24"
-//               xmlns="http://www.w3.org/2000/svg"
-//             >
-//               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-//             </svg>
-//           </button>
-//         </div>
-//         {/* Buy Section */}
-//         <div className="flex justify-between items-center">
-//           <div className="flex flex-col">
-//             <label className="text-sm text-gray-500">Buy</label>
-//             <input
-//               type="number"
-//               value={buyAmount}
-//               onChange={handleBuyAmountChange}
-//               className="text-2xl bg-transparent border-none focus:outline-none"
-//             />
-//             <span className="text-sm text-gray-500">$171,339.39 <span className="text-red-500">(-39.31%)</span></span>
-//           </div>
-//           <div className="flex items-center">
-//             <img src="https://cryptologos.cc/logos/compound-comp-logo.png" alt="COMP" className="w-6 h-6 mr-2" />
-//             <span>COMP</span>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ExchangeComponent;
-
 // SwapComponent.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { SwapSDK, ChainflipNetwork } from "@chainflip/sdk/swap";
+import { Wallet } from "ethers";
+
+
+type ChainflipNetwork = 'mainnet' | 'testnet' | 'perseverance';
+
 
 interface SwapComponentProps {
   sellValue: number;
@@ -87,8 +21,38 @@ const ExchangeComponent: React.FC<SwapComponentProps> = ({
   exchangeRate,
 }) => {
   const [sellAmount, setSellAmount] = useState<number>(0); // Pre-filled sell amount
-  const [sellCurrency, setSellCurrency] = useState<string>('ETH');
-  const [buyCurrency, setBuyCurrency] = useState<string>('COMP');
+  const [sellCurrency, setSellCurrency] = useState<string>('FLIP');
+  const [buyCurrency, setBuyCurrency] = useState<string>('ARB');
+  const [chains, setChains] = useState<any[]>([]);
+
+
+  const options = {
+    network: "perseverance" as ChainflipNetwork, // Testnet
+    backendServiceUrl: "https://example.chainflip.io",
+    signer: Wallet.fromPhrase("fold unique social wild fury mammal strike rule pet observe mule curve"),
+    broker: {
+      url: 'https://my.broker.io',
+      commissionBps: 0, // basis points, i.e. 100 = 1%
+    },
+  };
+   
+  const swapSDK = new SwapSDK(options);
+
+  const getChains = async () => {
+    const res = await swapSDK.getChains()
+    return res;
+  }
+
+  useEffect(() => {
+    const func = async () => {
+        const res = await getChains();
+        console.log(res);
+        setChains(res);
+        return res;
+    }
+    func()
+  }, []);
+
 
   const handleSellAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSellAmount(parseFloat(e.target.value));
@@ -123,9 +87,9 @@ const ExchangeComponent: React.FC<SwapComponentProps> = ({
             onChange={handleSellCurrencyChange}
             className="bg-blue-500 px-3 py-1 rounded-full dark:bg-blue-700"
           >
-            <option value="ETH">ETH</option>
-            <option value="BTC">BTC</option>
-            <option value="USDT">USDT</option>
+            <option value="ETH">FLIP</option>
+            <option value="BTC">ETH</option>
+            <option value="USDT">USDC</option>
             {/* Add more options as needed */}
           </select>
         </div>
@@ -152,9 +116,9 @@ const ExchangeComponent: React.FC<SwapComponentProps> = ({
             onChange={handleBuyCurrencyChange}
             className="bg-green-500 px-3 py-1 rounded-full dark:bg-green-700"
           >
-            <option value="COMP">COMP</option>
-            <option value="LINK">LINK</option>
-            <option value="DAI">DAI</option>
+            <option value="COMP">ARB</option>
+            <option value="LINK">USDC</option>
+            <option value="DAI">SOL</option>
             {/* Add more options as needed */}
           </select>
         </div>

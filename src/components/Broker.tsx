@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { ethers } from 'ethers';
+import { USDC_ADDR } from '../utils/arbitrum';
+import { abi } from '../utils/abi';
+
 
 const SwapInterface: React.FC = () => {
   const [destinationAddr, setDestinationAddr] = useState<string>('');
@@ -8,6 +12,10 @@ const SwapInterface: React.FC = () => {
   const [depositAddr, setDepositAddr] = useState<string>('');
   const [status, setStatus] = useState<string>('');
   const [id, setId] = useState<string>('');
+  const [amount, setAmount] = useState<string>('1');
+  const [provider, setProvider] = useState<ethers.JsonRpcProvider | null>(null);
+  const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
+
 
   const handleClick = (e : any) =>{
     e.preventDefault();
@@ -33,6 +41,52 @@ const SwapInterface: React.FC = () => {
     console.log("destinationAsset: " , destinationAsset);
     console.log("destinationAddress: " , destinationAddr);
   }
+  const handleSendToken = async () => {
+    if (!signer || !provider) {
+      setStatus('MetaMask is not connected');
+      return;
+    }
+
+    if (!depositAddr) {
+      setStatus('Recipient address is required');
+      return;
+    }
+
+    if (!amount || isNaN(Number(amount))) {
+      // setAmount('10')
+      setStatus('Invalid amount');
+      return;
+    }
+    console.log(amount)
+
+    try {
+      // ERC-20 token contract address (USDC in this case)
+      const tokenAddress = '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d';
+
+      // Define the ERC-20 contract ABI
+      const erc20Abi = [
+        // Only include the transfer function ABI
+        "function transfer(address to, uint256 amount) public returns (bool)"
+      ];
+
+      // Create a contract instance
+      const tokenContract = new ethers.Contract(tokenAddress, erc20Abi, signer);
+
+      // Convert amount to the appropriate units (assuming USDC has 6 decimals)
+      const amountInUnits = ethers.formatUnits(amount, 6);
+
+      // Send the transaction
+      const tx = await tokenContract.transfer(depositAddr, amountInUnits);
+      setStatus('Transaction sent. Waiting for confirmation...');
+
+      // Wait for the transaction to be mined
+      await tx.wait();
+      setStatus('Transaction confirmed!');
+    } catch (error) {
+      console.error('Error sending token:', error);
+      setStatus('Error sending token');
+    }
+  };
 
 
   useEffect(() => {
@@ -60,12 +114,38 @@ const SwapInterface: React.FC = () => {
 
       intervalId = setInterval(func, 60000); // Set interval to call the function every 1 minute
     }
-
     return () => {
       if (intervalId) clearInterval(intervalId); // Clear interval on component unmount or when depositAddress changes
     };
   }, [depositAddr]);
 
+
+  useEffect(() => {
+    const setupProvider = async () => {
+      if (window.ethereum) {
+        try {
+          const newProvider = new ethers.BrowserProvider(window.ethereum);
+          setProvider(newProvider);
+          await newProvider.send('eth_requestAccounts', []);
+          const newSigner = newProvider.getSigner();
+          setSigner(newSigner);
+        } catch (error) {
+          // setStatus('Error setting up MetaMask: ' + error.message);
+          console.log('Error setting up MetaMask: ' + error);
+        }
+      } else {
+        setStatus('MetaMask is not installed');
+      }
+    };
+
+    setupProvider();
+  }, []);
+
+  const handleDeposit = () => {
+    console.log("handleDeposit")
+    handleSendToken();
+    console.log("Depositted")
+  }
 
   return (
     <div className="p-4 border-t flex flex-col justify-center items-center border-blue-200">
@@ -172,6 +252,9 @@ const SwapInterface: React.FC = () => {
           
           {depositAddr ? <p className="mb-2">{`Deposit ${sourceAsset} to ${depositAddr} address to initiate swap` }</p>: null}
           <p className='mb-2'>{`Status : ${status}`}</p>
+
+          <button onClick={handleDeposit}>Deposit</button>
+          {status === 'COMPLETE' && <p className='mb-2'>Swap Completed </p>}
         </div>
       </div>
 
