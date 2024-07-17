@@ -31,7 +31,7 @@ const SwapInterface: React.FC = () => {
     .then((response) => {
       console.log(JSON.stringify(response.data));
       setId(JSON.stringify(response.data.id));
-      setDepositAddr(JSON.stringify(response.data.address));
+      setDepositAddr(response.data.address);
     })
     .catch((error) => {
       console.log(error);
@@ -61,26 +61,42 @@ const SwapInterface: React.FC = () => {
 
     try {
       // ERC-20 token contract address (USDC in this case)
-      const tokenAddress = '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d';
+      let tokenAddress 
+      if(sourceAsset === "flip.eth"){
+        tokenAddress = '0xdC27c60956cB065D19F08bb69a707E37b36d8086'
+      }else if(sourceAsset === "usdt.eth"){
+        tokenAddress = "0x27CEA6Eb8a21Aae05Eb29C91c5CA10592892F584"
+      }else {
+        alert("We don't switch from this source now, we are working on it....")
+        return
+      }
 
       // Define the ERC-20 contract ABI
       const erc20Abi = [
         // Only include the transfer function ABI
-        "function transfer(address to, uint256 amount) public returns (bool)"
+        "function transfer(address to, uint256 amount) public returns (bool)",
+        "function balanceOf(address addr) view returns (uint)"
       ];
 
       // Create a contract instance
       const tokenContract = new ethers.Contract(tokenAddress, erc20Abi, signer);
+      console.log('Token Contract:', tokenContract);
 
-      // Convert amount to the appropriate units (assuming USDC has 6 decimals)
-      const amountInUnits = ethers.formatUnits(amount, 6);
+      // Convert amount to the appropriate units (assuming FLIP has 18 decimals)
+      const amountInUnits = ethers.parseUnits(amount, 6);
+      console.log('Recipient:', depositAddr);
+      console.log('Amount in units:', amountInUnits.toString());
 
       // Send the transaction
+      console.log('Preparing to send transaction with:', { depositAddr, amountInUnits });
       const tx = await tokenContract.transfer(depositAddr, amountInUnits);
-      setStatus('Transaction sent. Waiting for confirmation...');
-
+      console.log('Transaction:', tx);
+      // const res = await tokenContract.balanceOf("0xfe0442fB1599FE52Bd9Cd40afe0F37F297d867A7")
+      // console.log(res, "hiii")
+      console.log(await signer, "h")
+      console.log(provider, "h")
       // Wait for the transaction to be mined
-      await tx.wait();
+      await tx.wait();  
       setStatus('Transaction confirmed!');
     } catch (error) {
       console.error('Error sending token:', error);
@@ -93,6 +109,10 @@ const SwapInterface: React.FC = () => {
     let intervalId: NodeJS.Timeout;
 
     const func = async () => {
+
+      if(status === "COMPLETE"){
+        return
+      }
       let config = {
         method: 'get',
         maxBodyLength: Infinity,
@@ -125,13 +145,15 @@ const SwapInterface: React.FC = () => {
       if (window.ethereum) {
         try {
           const newProvider = new ethers.BrowserProvider(window.ethereum);
+          console.log('Provider:', newProvider);
           setProvider(newProvider);
-          await newProvider.send('eth_requestAccounts', []);
-          const newSigner = newProvider.getSigner();
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const newSigner = await newProvider.getSigner();
+          console.log('Signer:', newSigner);
           setSigner(newSigner);
         } catch (error) {
+          console.error('Error setting up MetaMask:', error);
           // setStatus('Error setting up MetaMask: ' + error.message);
-          console.log('Error setting up MetaMask: ' + error);
         }
       } else {
         setStatus('MetaMask is not installed');
@@ -206,7 +228,7 @@ const SwapInterface: React.FC = () => {
                     <input type="text" name="floating_email" id="floating_email" className="block py-2.5 px-0 w-full text-sm text-black border-0 border-b-2 appearance-none bg-transparent focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required value={destinationAddr} onChange={(e) => setDestinationAddr(e.target.value)} />
                     <label htmlFor="floating_email" className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Destination address</label>
                 </div>
-                <label htmlFor="sourceAsset" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Source Asset</label>
+                <label htmlFor="sourceAsset" className="block mt-4 text-sm font-medium text-black ">Select Source Asset</label>
                 <select 
                     id="sourceAsset" 
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -222,7 +244,7 @@ const SwapInterface: React.FC = () => {
                     <option value="usdc.arb">usdc.arb</option>
                     <option value="usdt.eth">usdt.eth</option>
                 </select>
-                <label htmlFor="destiAsset" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Destination Asset</label>
+                <label htmlFor="destiAsset" className="block mt-4 text-sm font-medium text-gray-900 ">Select Destination Asset</label>
                 <select 
                     id="destAsset" 
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -253,7 +275,7 @@ const SwapInterface: React.FC = () => {
           {depositAddr ? <p className="mb-2">{`Deposit ${sourceAsset} to ${depositAddr} address to initiate swap` }</p>: null}
           <p className='mb-2'>{`Status : ${status}`}</p>
 
-          <button onClick={handleDeposit}>Deposit</button>
+          <button onClick={handleDeposit} className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>Deposit</button>
           {status === 'COMPLETE' && <p className='mb-2'>Swap Completed </p>}
         </div>
       </div>
