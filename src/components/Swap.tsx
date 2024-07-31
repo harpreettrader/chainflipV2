@@ -57,36 +57,44 @@ const SwapInterface = () => {
       return;
     }
 
-    let tokenAddress;
-    if (sourceAsset === "flip.eth") {
-      tokenAddress = '0xdC27c60956cB065D19F08bb69a707E37b36d8086';
-    } else if (sourceAsset === "usdt.eth") {
-      tokenAddress = "0x27CEA6Eb8a21Aae05Eb29C91c5CA10592892F584";
-    } else {
-      alert("We don't switch from this source now, we are working on it....");
-      return;
-    }
-
-    const erc20Abi = [
-      "function transfer(address to, uint256 amount) public returns (bool)",
-      "function balanceOf(address addr) view returns (uint)"
-    ];
-
-    const tokenContract = new ethers.Contract(tokenAddress, erc20Abi, signer);
-    console.log('Token Contract:', tokenContract);
-
-    const amountInUnits = ethers.parseUnits(amount, 6);
-    console.log('Recipient:', depositAddr);
-    console.log('Amount in units:', amountInUnits.toString());
-
     try {
-      console.log('Preparing to send transaction with:', { depositAddr, amountInUnits });
-      const tx = await tokenContract.transfer(depositAddr, amountInUnits);
-      console.log('Transaction:', tx);
-      console.log(await signer, "h");
-      console.log(provider, "h");
-      await tx.wait();
-      setStatus('Transaction confirmed!');
+      // Check if the source asset is Sepolia ETH'
+      if (sourceAsset === "eth.eth") {
+        
+        const tx = await signer.sendTransaction({
+          to: depositAddr,
+          value: ethers.parseEther(amount) // ETH has 18 decimals
+        });
+        console.log('Transaction:', tx);
+        await tx.wait();
+        setStatus('Transaction confirmed!');
+        return;
+      }else {  
+        // Handle ERC-20 token transfers
+        let tokenAddress;
+        if (sourceAsset === "flip.eth") {
+          tokenAddress = '0xdC27c60956cB065D19F08bb69a707E37b36d8086';
+        } else if (sourceAsset === "usdt.eth") {
+          tokenAddress = "0x27CEA6Eb8a21Aae05Eb29C91c5CA10592892F584";
+        } else {
+          alert("We don't switch from this source now, we are working on it....");
+          return;
+        }
+  
+        // ERC-20 contract ABI
+        const erc20Abi = [
+          "function transfer(address to, uint256 amount) public returns (bool)",
+          "function balanceOf(address addr) view returns (uint)"
+        ];
+  
+        const tokenContract = new ethers.Contract(tokenAddress, erc20Abi, signer);
+        const amountInUnits = ethers.parseUnits(amount, 6);
+        const tx = await tokenContract.transfer(depositAddr, amountInUnits);
+        console.log('Transaction:', tx);
+        await tx.wait();
+        setStatus('Transaction confirmed!');
+      }
+      
     } catch (error) {
       console.error('Error sending token:', error);
       setStatus('Error sending token');
@@ -170,6 +178,12 @@ const SwapInterface = () => {
               <div className="flex items-center ps-3">
                 <input id="horizontal-list-radio-license" type="radio" value="" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" />
                 <label htmlFor="horizontal-list-radio-license" className="w-full py-3 ms-2 text-sm font-medium text-gray-900">THORChain</label>
+              </div>
+            </li>
+            <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r">
+              <div className="flex items-center ps-3">
+                <input id="horizontal-list-radio-license" type="radio" value="" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" />
+                <label htmlFor="horizontal-list-radio-license" className="w-full py-3 ms-2 text-sm font-medium text-gray-900">ChainFlip</label>
               </div>
             </li>
           </ul>
