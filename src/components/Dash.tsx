@@ -7,17 +7,17 @@ import Swap from './Swap';
 import Broker from './Broker';
 
 const Dashboard: React.FC = () => {
-    const [activeComponent, setActiveComponent] = useState<string>('Swap');
+  const [activeComponent, setActiveComponent] = useState<string>('Home');
 
   const renderComponent = () => {
     switch (activeComponent) {
       case 'Home':
-        return <Home />;
+        return <Home setActiveComponent={setActiveComponent} />;
       case 'Shop':
         return <Shop />;
       case 'Play':
         return <Play />;
-      case 'Broker':  
+      case 'Broker':
         return <Broker />;
       default:
         return <Swap />;
@@ -27,9 +27,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="flex">
       <Sidebar setActiveComponent={setActiveComponent} />
-      <div className="flex-1 p-4">
-        {renderComponent()}
-      </div>
+      <div className="flex-1 p-4">{renderComponent()}</div>
     </div>
   );
 };

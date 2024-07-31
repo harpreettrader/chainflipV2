@@ -6,16 +6,38 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ setActiveComponent }) => {
   return (
-    <div className="w-64 h-screen bg-gray-800 text-white">
-      <div className="p-4">
-        <ul className="mt-4">
-          <li className="py-2 px-4 hover:bg-gray-700 cursor-pointer" onClick={() => setActiveComponent('Home')}>Home</li>
-          <li className="py-2 px-4 hover:bg-gray-700 cursor-pointer" onClick={() => setActiveComponent('Shop')}>Shop</li>
-          <li className="py-2 px-4 hover:bg-gray-700 cursor-pointer" onClick={() => setActiveComponent('Play')}>Play</li>
-          <li className="py-2 px-4 hover:bg-gray-700 cursor-pointer" onClick={() => setActiveComponent('Swap')}>Swap</li>
-          <li className="py-2 px-4 hover:bg-gray-700 cursor-pointer" onClick={() => setActiveComponent('Broker')}>Broker</li>
-        </ul>
-      </div>
+      <div className="w-64 bg-gray-500 text-white min-h-screen flex flex-col p-4">
+      <h2 className="text-2xl font-bold mb-4 text-black">Sidebar</h2>
+      <button
+        onClick={() => setActiveComponent('Home')}
+        className="mb-2 py-2 px-4 bg-gray-800 rounded hover:bg-gray-600 transition duration-300"
+      >
+        Home
+      </button>
+      <button
+        onClick={() => setActiveComponent('Shop')}
+        className="mb-2 py-2 px-4  bg-gray-800 hover:bg-gray-600 transition duration-300"
+      >
+        Shop
+      </button>
+      <button
+        onClick={() => setActiveComponent('Play')}
+        className="mb-2 py-2 px-4  bg-gray-800 hover:bg-gray-600 transition duration-300"
+      >
+        Play
+      </button>
+      <button
+        onClick={() => setActiveComponent('Swap')}
+        className="mb-2 py-2 px-4  bg-gray-800 hover:bg-gray-600 transition duration-300"
+      >
+        Swap
+      </button>
+      <button
+        onClick={() => setActiveComponent('Broker')}
+        className="mb-2 py-2 px-4  bg-gray-800 hover:bg-gray-600 transition duration-300"
+      >
+        Broker
+      </button>
     </div>
   );
 };

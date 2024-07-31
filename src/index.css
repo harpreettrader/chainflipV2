@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Add this to your CSS file */
+.loader {
+    border-top-color: #3498db;
+    animation: spinner 0.6s linear infinite;
+  }
+  
+  @keyframes spinner {
+    to { transform: rotate(360deg); }
+  }
+  .break-all {
+    word-break: break-all;
+  }
+    

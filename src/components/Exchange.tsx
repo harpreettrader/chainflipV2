@@ -69,7 +69,7 @@ const ExchangeComponent: React.FC<SwapComponentProps> = ({
   const buyAmount = sellAmount * exchangeRate;
 
   return (
-    <div className="max-w-md mx-auto bg-gray-900 text-white p-6 rounded-lg shadow-lg dark:bg-gra dark:text-gray-200">
+    <div className="max-w-md mx-auto bg-gray-500 text-white p-6 rounded-lg shadow-lg dark:bg-gra dark:text-gray-200">
       <div className="flex justify-between items-center mb-2">
         <div className='p-2'>
           <h2 className="text-xl font-bold">Sell</h2>
@@ -77,7 +77,7 @@ const ExchangeComponent: React.FC<SwapComponentProps> = ({
             type="number"
             value={sellAmount}
             onChange={handleSellAmountChange}
-            className="text-3xl bg-gray-800 p-2 rounded  w-full dark:bg-gray-700"
+            className="text-3xl bg-gray-800 p-2 rounded  w-full dark:bg-gray-800"
           />
           <p className="text-lg">${(sellAmount * sellValue).toFixed(2)!=='NaN'?(sellAmount * sellValue).toFixed(2):'0.00'}</p>
         </div>
@@ -85,7 +85,7 @@ const ExchangeComponent: React.FC<SwapComponentProps> = ({
           <select
             value={sellCurrency}
             onChange={handleSellCurrencyChange}
-            className="bg-blue-500 px-3 py-1 rounded-full dark:bg-blue-700"
+            className="bg-gray-800 px-3 py-1 rounded-full dark:bg-gray-800"
           >
             <option value="ETH">FLIP</option>
             <option value="BTC">ETH</option>
