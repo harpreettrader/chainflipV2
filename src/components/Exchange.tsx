@@ -99,9 +99,9 @@ const ExchangeComponent: React.FC<SwapComponentProps> = ({
           <span className="text-2xl">↓</span>
         </div>
       </div>
-      <div className="flex justify-between items-center mb-4">
-        <div className="p-2">
-          <h2 className="text-xl font-bold">Buy</h2>
+      <div className="flex justify-between items-center mb-4 ">
+        <div className="p-2 bg-gray-800">
+          <h2 className="text-xl font-bold ">Buy</h2>
           <p className="text-3xl">{buyAmount.toFixed(2)!=='NaN'?buyAmount.toFixed(2):'0.00'}</p>
           <p className="text-lg">
             ${(buyAmount * buyValue).toFixed(2)!=='NaN'?(buyAmount * buyValue).toFixed(2):'0.00'}{' '}

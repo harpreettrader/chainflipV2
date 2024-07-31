@@ -32,15 +32,6 @@ const SwapInterface: React.FC = () => {
       });
   }
 
-  const handleChainChange = (chain: string) => {
-    setSelectedChain(chain);
-    if (chain === 'Maya' || chain === 'THORChain') {
-      setProcessingMessage(`${chain} is under process`);
-    } else {
-      setProcessingMessage('');
-    }
-  }
-
   return (
     <div className="p-4 border-t flex flex-col justify-center items-center border-blue-200">
       {depositAddr}
@@ -58,8 +49,8 @@ const SwapInterface: React.FC = () => {
                   value="ChainFlip"
                   name="list-radio"
                   className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
-                  checked={selectedChain === 'ChainFlip'}
-                  onChange={() => handleChainChange('ChainFlip')}
+                  // checked={selectedChain === 'ChainFlip'}
+
                 />
                 <label htmlFor="chainflip-radio" className="w-full py-3 ms-2 text-sm font-medium text-gray-900">
                   ChainFlip
@@ -74,8 +65,8 @@ const SwapInterface: React.FC = () => {
                   value="Maya"
                   name="list-radio"
                   className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
-                  checked={selectedChain === 'Maya'}
-                  onChange={() => handleChainChange('Maya')}
+                  // checked={selectedChain === 'Maya'}
+
                 />
                 <label htmlFor="maya-radio" className="w-full py-3 ms-2 text-sm font-medium text-gray-900">
                   Maya
@@ -90,10 +81,10 @@ const SwapInterface: React.FC = () => {
                   value="THORChain"
                   name="list-radio"
                   className="w-4 h-4 text-blue-600 bg-gray-500 border-gray-300 focus:ring-blue-500"
-                  checked={selectedChain === 'THORChain'}
-                  onChange={() => handleChainChange('THORChain')}
+                  // checked={selectedChain === 'THORChain'}
+                  
                 />
-                <label htmlFor="thorchain-radio" className="w-full py-3 ms-2 text-sm font-medium text-gray-900">
+                <label htmlFor="thorchain-radio" className="w-full py-3 ms-2 text-sm font-medium text-gray-800">
                   THORChain
                 </label>
               </div>
@@ -111,10 +102,10 @@ const SwapInterface: React.FC = () => {
           ) : (
             <ExchangeComponent sellValue={3137.2} buyValue={47.60} priceChange={-39.3} exchangeRate={40} />
           )}
-          
+
           <button className="w-full rounded-xl mt-2 p-2 bg-gray-800 text-white" onClick={handleClick}>Swap</button>
         </div>
-  
+
         <div className="w-1/2 border border-gray-400 p-4 rounded-xl ml-4 flex flex-col justify-start items-start min-h-[300px]">
           <h2 className="text-xl font-bold mb-4">Info</h2>
           <p className="mb-2">Gas Fee: ...</p>
