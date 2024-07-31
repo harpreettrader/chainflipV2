@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ethers } from 'ethers';
-import { USDC_ADDR } from '../utils/arbitrum';
-import { abi } from '../utils/abi';
 
 const SwapInterface: React.FC = () => {
   const [destinationAddr, setDestinationAddr] = useState<string>('');
@@ -11,8 +9,9 @@ const SwapInterface: React.FC = () => {
   const [depositAddr, setDepositAddr] = useState<string>('');
   const [status, setStatus] = useState<string>('');
   const [id, setId] = useState<string>('');
-  const [amount, setAmount] = useState<string>('1');
-  const [provider, setProvider] = useState<ethers.JsonRpcProvider | null>(null);
+  const [amount] = useState<string>('1');
+  const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
+
   const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -134,7 +133,8 @@ const SwapInterface: React.FC = () => {
         try {
           const newProvider = new ethers.BrowserProvider(window.ethereum);
           console.log('Provider:', newProvider);
-          setProvider(newProvider);
+          setProvider(newProvider as ethers.BrowserProvider);
+
           await window.ethereum.request({ method: 'eth_requestAccounts' });
           const newSigner = await newProvider.getSigner();
           console.log('Signer:', newSigner);

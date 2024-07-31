@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ethers } from 'ethers';
 
@@ -10,11 +10,11 @@ const SwapInterface = () => {
   const [status, setStatus] = useState('');
   const [id, setId] = useState('');
   const [amount, setAmount] = useState('1');
-  const [provider, setProvider] = useState(null);
-  const [signer, setSigner] = useState(null);
+  const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
+  const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleClick = async (e) => {
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setLoading(true);
 
@@ -61,9 +61,9 @@ const SwapInterface = () => {
       // Check if the source asset is Sepolia ETH'
       if (sourceAsset === "eth.eth") {
         
-        const tx = await signer.sendTransaction({
+        const tx = await (signer as ethers.Signer).sendTransaction({
           to: depositAddr,
-          value: ethers.parseEther(amount) // ETH has 18 decimals
+          value: ethers.parseEther(amount)
         });
         console.log('Transaction:', tx);
         await tx.wait();
@@ -102,7 +102,7 @@ const SwapInterface = () => {
   };
 
   useEffect(() => {
-    let intervalId;
+    let intervalId: NodeJS.Timeout | undefined;
 
     const func = async () => {
       if (status === "COMPLETE") {
@@ -138,11 +138,11 @@ const SwapInterface = () => {
         try {
           const newProvider = new ethers.BrowserProvider(window.ethereum);
           console.log('Provider:', newProvider);
-          setProvider(newProvider);
+          setProvider(newProvider as ethers.BrowserProvider);
           await window.ethereum.request({ method: 'eth_requestAccounts' });
           const newSigner = await newProvider.getSigner();
           console.log('Signer:', newSigner);
-          setSigner(newSigner);
+          setSigner(newSigner as ethers.JsonRpcSigner);
         } catch (error) {
           console.error('Error setting up MetaMask:', error);
           setStatus('Error setting up MetaMask: ' + error);
