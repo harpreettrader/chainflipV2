@@ -13,6 +13,7 @@ const SwapInterface = () => {
   const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
   const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
   const [loading, setLoading] = useState(false);
+  const [swapProvider, setSwapProvider] = useState<string>("ChainFlip");
 
   const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -132,6 +133,55 @@ const SwapInterface = () => {
     };
   }, [depositAddr]);
 
+  const postTransaction = async (e :React.MouseEvent<HTMLButtonElement>) => {
+
+    e.preventDefault();
+    setLoading(true);
+
+    const url = 'https://api.swapkit.dev/channel';
+    const headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    };
+    const body = {
+      sellAsset: `${sourceAsset}`,
+      buyAsset: `${destinationAsset}`,
+      destinationAddress: `${destinationAddr}`,
+      affiliateFee: 0
+    };
+  
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body)
+      });
+      const data = await response.json();
+      console.log('Success:', data);
+      setId(data.channelId);
+      setDepositAddr(data.depositAddress);
+    } catch (error) {
+      console.error('Error:', error);
+    }finally{
+      setLoading(false);
+    }
+  };
+  
+
+  const handleSwap = (e :React.MouseEvent<HTMLButtonElement>) => {
+    switch(swapProvider) {
+      case "ChainFlip":
+        handleClick(e);
+        break;
+      case "ThorChain":
+        postTransaction(e);
+        break;
+      default:
+        handleClick(e);
+        break;
+    }
+  }
+
   useEffect(() => {
     const setupProvider = async () => {
       if (window.ethereum) {
@@ -170,19 +220,22 @@ const SwapInterface = () => {
           <ul className='items-center w-full text-sm font-medium mb-4 text-gray-900 bg-gray-100 border border-gray-200 rounded-lg sm:flex'>
             <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r">
               <div className="flex items-center ps-3">
-                <input id="horizontal-list-radio-license" type="radio" value="" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" />
+                <input id="horizontal-list-radio-maya" type="radio" value="Maya" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" checked={swapProvider === 'Maya'} onChange={(e) => setSwapProvider(e.target.value)} />
+                {/* <input id="horizontal-list-radio-license" type="radio" value="" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" /> */}
                 <label htmlFor="horizontal-list-radio-license" className="w-full py-3 ms-2 text-sm font-medium text-gray-900">Maya</label>
               </div>
             </li>
             <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r">
               <div className="flex items-center ps-3">
-                <input id="horizontal-list-radio-license" type="radio" value="" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" />
+                <input id="horizontal-list-radio-thorchain" type="radio" value="ThorChain" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" checked={swapProvider === 'ThorChain'} onChange={(e) => setSwapProvider(e.target.value)} />
+                {/* <input id="horizontal-list-radio-license" type="radio" value="" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" /> */}
                 <label htmlFor="horizontal-list-radio-license" className="w-full py-3 ms-2 text-sm font-medium text-gray-900">THORChain</label>
               </div>
             </li>
             <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r">
               <div className="flex items-center ps-3">
-                <input id="horizontal-list-radio-license" type="radio" value="" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" />
+                <input id="horizontal-list-radio-chainflip" type="radio" value="ChainFlip" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" checked={swapProvider === 'ChainFlip'} onChange={(e) => setSwapProvider(e.target.value)} />
+                {/* <input id="horizontal-list-radio-license" type="radio" value="" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" /> */}
                 <label htmlFor="horizontal-list-radio-license" className="w-full py-3 ms-2 text-sm font-medium text-gray-900">ChainFlip</label>
               </div>
             </li>
@@ -219,14 +272,15 @@ const SwapInterface = () => {
                 >
                   <option value="" disabled>Choose an asset</option>
                   <option value="btc.btc">btc.btc</option>
-                  <option value="dot.dot">dot.dot</option>
-                  <option value="eth.arb">eth.arb</option>
-                  <option value="eth.eth">eth.eth</option>
-                  <option value="flip.eth">flip.eth</option>
-                  <option value="usdc.arb">usdc.arb</option>
-                  <option value="usdt.eth">usdt.eth</option>
+                  {swapProvider !== "ThorChain" &&
+                  <option value="dot.dot">dot.dot</option>}
+                  {swapProvider !== "ThorChain" && <option value="eth.arb">eth.arb</option>}
+                  {swapProvider !== "ThorChain" && <option value="eth.eth">eth.eth</option>}
+                  {swapProvider !== "ThorChain" && <option value="flip.eth">flip.eth</option>}
+                  {swapProvider !== "ThorChain" && <option value="usdc.arb">usdc.arb</option>}
+                  {swapProvider !== "ThorChain" && <option value="usdt.eth">usdt.eth</option>}
                 </select>
-                <button className="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center" onClick={handleClick} disabled={loading}>
+                <button className="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center" onClick={handleSwap}  disabled={loading}>
                   {loading ? (
                     <span className="flex items-center">
                       <svg className="animate-spin h-5 w-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
